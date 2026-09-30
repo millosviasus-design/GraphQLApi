@@ -1,0 +1,41 @@
+meta {
+  name: Obtener Usuario
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{usuarios_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($id: UUID!) {
+    obtenerUsuario(id: $id) {
+      id
+      nombre
+      email
+      telefono
+      estado
+      fechaCreacion
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440000"
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

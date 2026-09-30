@@ -1,0 +1,48 @@
+meta {
+  name: Obtener Orden
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{ordenes_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($id: UUID!) {
+    obtenerOrden(id: $id) {
+      id
+      usuarioId
+      estado
+      total
+      moneda
+      fechaCreacion
+      fechaActualizacion
+      items {
+        id
+        productoId
+        cantidad
+        precioUnitario
+        subtotal
+      }
+    }
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440001"
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

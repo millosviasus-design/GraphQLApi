@@ -1,0 +1,40 @@
+meta {
+  name: Actualizar Estado Orden
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{ordenes_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: ActualizarEstadoOrdenInput!) {
+    actualizarEstadoOrden(input: $input) {
+      id
+      estado
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  input: {
+    ordenId: "550e8400-e29b-41d4-a716-446655440001"
+    estado: "confirmada"
+  }
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

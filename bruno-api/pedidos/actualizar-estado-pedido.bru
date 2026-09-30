@@ -1,0 +1,41 @@
+meta {
+  name: Actualizar Estado Pedido
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{pedidos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: ActualizarEstadoPedidoInput!) {
+    actualizarEstadoPedido(input: $input) {
+      id
+      estado
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  input: {
+    pedidoId: "550e8400-e29b-41d4-a716-446655440003"
+    estado: "en_camino"
+    comentario: "El pedido ha sido recogido por el repartidor"
+  }
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

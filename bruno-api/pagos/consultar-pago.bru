@@ -1,0 +1,44 @@
+meta {
+  name: Consultar Pago
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{pagos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($id: UUID!) {
+    obtenerPago(id: $id) {
+      id
+      ordenId
+      usuarioId
+      monto
+      moneda
+      metodo
+      estado
+      referencia
+      fechaCreacion
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440002"
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

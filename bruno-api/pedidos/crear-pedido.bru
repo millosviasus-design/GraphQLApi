@@ -1,0 +1,56 @@
+meta {
+  name: Crear Pedido
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{pedidos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: CrearPedidoInput!) {
+    crearPedido(input: $input) {
+      id
+      ordenId
+      usuarioId
+      estado
+      fechaEntregaEstimada
+      fechaCreacion
+    }
+  }
+}
+
+vars:req {
+  input: {
+    ordenId: "550e8400-e29b-41d4-a716-446655440001"
+    usuarioId: "550e8400-e29b-41d4-a716-446655440000"
+    direccionEntrega: {
+      calle: "Av. Insurgentes 456"
+      ciudad: "CDMX"
+      estado: "Ciudad de México"
+      codigoPostal: "03100"
+      pais: "México"
+    }
+    fechaEntregaEstimada: "2026-10-05T18:00:00Z"
+  }
+}
+
+assert {
+  res.status: 200
+  res.body.data.crearPedido.id: isString
+  res.body.data.crearPedido.estado: eq("preparacion")
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Pedido creado correctamente", function() {
+    expect(res.getBody().data.crearPedido.estado).to.equal("preparacion");
+  });
+}

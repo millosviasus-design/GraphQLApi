@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # Base de datos para cada microservicio
+  db-usuarios:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: usuarios_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_usuarios:/var/lib/postgresql/data
+
+  db-pagos:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: pagos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata_pagos:/var/lib/postgresql/data
+
+  db-ordenes:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ordenes_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata_ordenes:/var/lib/postgresql/data
+
+  db-pedidos:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: pedidos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata_pedidos:/var/lib/postgresql/data
+
+  # Redis para eventos
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  # Microservicio Usuarios
+  servicio-usuarios:
+    build: ./microservicios/servicio-usuarios
+    ports:
+      - "4001:4001"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db-usuarios:5432/usuarios_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - db-usuarios
+      - redis
+
+  # Microservicio Pagos
+  servicio-pagos:
+    build: ./microservicios/servicio-pagos
+    ports:
+      - "4002:4002"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db-pagos:5432/pagos_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - db-pagos
+      - redis
+
+  # Microservicio Órdenes
+  servicio-ordenes:
+    build: ./microservicios/servicio-ordenes
+    ports:
+      - "4003:4003"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db-ordenes:5432/ordenes_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - db-ordenes
+      - redis
+
+  # Microservicio Pedidos
+  servicio-pedidos:
+    build: ./microservicios/servicio-pedidos
+    ports:
+      - "4004:4004"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db-pedidos:5432/pedidos_db
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      - db-pedidos
+      - redis
+
+  # API Gateway
+  api-gateway:
+    build: ./microservicios/api-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      USUARIOS_URL: http://servicio-usuarios:4001/graphql
+      PAGOS_URL: http://servicio-pagos:4002/graphql
+      ORDENES_URL: http://servicio-ordenes:4003/graphql
+      PEDIDOS_URL: http://servicio-pedidos:4004/graphql
+    depends_on:
+      - servicio-usuarios
+      - servicio-pagos
+      - servicio-ordenes
+      - servicio-pedidos
+
+volumes:
+  pgdata_usuarios:
+  pgdata_pagos:
+  pgdata_ordenes:
+  pgdata_pedidos:

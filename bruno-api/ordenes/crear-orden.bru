@@ -1,0 +1,74 @@
+meta {
+  name: Crear Orden
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{ordenes_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: CrearOrdenInput!) {
+    crearOrden(input: $input) {
+      id
+      usuarioId
+      estado
+      total
+      moneda
+      fechaCreacion
+      items {
+        id
+        productoId
+        cantidad
+        precioUnitario
+        subtotal
+      }
+    }
+  }
+}
+
+vars:req {
+  input: {
+    usuarioId: "550e8400-e29b-41d4-a716-446655440000"
+    items: [
+      {
+        productoId: "550e8400-e29b-41d4-a716-446655440010"
+        cantidad: 2
+        precioUnitario: 500.00
+      },
+      {
+        productoId: "550e8400-e29b-41d4-a716-446655440011"
+        cantidad: 1
+        precioUnitario: 350.00
+      }
+    ]
+    moneda: "MXN"
+    direccionEnvio: {
+      calle: "Av. Insurgentes 456"
+      ciudad: "CDMX"
+      estado: "Ciudad de México"
+      codigoPostal: "03100"
+      pais: "México"
+    }
+  }
+}
+
+assert {
+  res.status: 200
+  res.body.data.crearOrden.id: isString
+  res.body.data.crearOrden.estado: eq("pendiente")
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Orden creada correctamente", function() {
+    expect(res.getBody().data.crearOrden.estado).to.equal("pendiente");
+  });
+}

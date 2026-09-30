@@ -1,0 +1,33 @@
+meta {
+  name: Eliminar Usuario
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{usuarios_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($id: UUID!) {
+    eliminarUsuario(id: $id)
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440000"
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

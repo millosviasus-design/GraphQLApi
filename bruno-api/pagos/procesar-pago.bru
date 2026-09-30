@@ -1,0 +1,54 @@
+meta {
+  name: Procesar Pago
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{pagos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: ProcesarPagoInput!) {
+    procesarPago(input: $input) {
+      id
+      ordenId
+      usuarioId
+      monto
+      moneda
+      metodo
+      estado
+      referencia
+      fechaCreacion
+    }
+  }
+}
+
+vars:req {
+  input: {
+    ordenId: "550e8400-e29b-41d4-a716-446655440001"
+    usuarioId: "550e8400-e29b-41d4-a716-446655440000"
+    monto: 1500.00
+    moneda: "MXN"
+    metodo: "tarjeta"
+  }
+}
+
+assert {
+  res.status: 200
+  res.body.data.procesarPago.id: isString
+  res.body.data.procesarPago.estado: eq("completado")
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  test("Pago procesado correctamente", function() {
+    expect(res.getBody().data.procesarPago.estado).to.equal("completado");
+  });
+}

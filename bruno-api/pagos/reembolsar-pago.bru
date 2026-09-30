@@ -1,0 +1,40 @@
+meta {
+  name: Reembolsar Pago
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{pagos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($input: ReembolsarPagoInput!) {
+    reembolsarPago(input: $input) {
+      id
+      estado
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  input: {
+    pagoId: "550e8400-e29b-41d4-a716-446655440002"
+    motivo: "Solicitud del cliente"
+  }
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

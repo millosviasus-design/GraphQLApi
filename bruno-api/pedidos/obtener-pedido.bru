@@ -1,0 +1,41 @@
+meta {
+  name: Obtener Pedido
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{pedidos_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($id: UUID!) {
+    obtenerPedido(id: $id) {
+      id
+      ordenId
+      usuarioId
+      estado
+      fechaEntregaEstimada
+      fechaCreacion
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440003"
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

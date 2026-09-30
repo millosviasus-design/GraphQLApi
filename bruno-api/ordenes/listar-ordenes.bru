@@ -1,0 +1,45 @@
+meta {
+  name: Listar Órdenes
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{ordenes_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($usuarioId: UUID, $estado: String, $skip: Int, $limit: Int) {
+    listarOrdenes(usuarioId: $usuarioId, estado: $estado, skip: $skip, limit: $limit) {
+      items {
+        id
+        usuarioId
+        estado
+        total
+        moneda
+        fechaCreacion
+      }
+      total
+    }
+  }
+}
+
+vars:req {
+  estado: "pendiente"
+  skip: 0
+  limit: 10
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,45 @@
+meta {
+  name: Listar Usuarios
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{usuarios_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  query($estado: String, $skip: Int, $limit: Int) {
+    listarUsuarios(estado: $estado, skip: $skip, limit: $limit) {
+      items {
+        id
+        nombre
+        email
+        telefono
+        estado
+        fechaCreacion
+      }
+      total
+    }
+  }
+}
+
+vars:req {
+  estado: "activo"
+  skip: 0
+  limit: 10
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

@@ -1,0 +1,44 @@
+meta {
+  name: Actualizar Usuario
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{usuarios_url}}
+  body: graphql
+  headers {
+    Content-Type: application/json
+  }
+}
+
+body:graphql {
+  mutation($id: UUID!, $input: ActualizarUsuarioInput!) {
+    actualizarUsuario(id: $id, input: $input) {
+      id
+      nombre
+      email
+      telefono
+      estado
+      fechaActualizacion
+    }
+  }
+}
+
+vars:req {
+  id: "550e8400-e29b-41d4-a716-446655440000"
+  input: {
+    nombre: "Juan Pérez Actualizado"
+    telefono: "+52 555 9876543"
+  }
+}
+
+assert {
+  res.status: 200
+}
+
+tests {
+  test("Status code is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
